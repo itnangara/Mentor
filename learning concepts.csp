@@ -1,0 +1,653 @@
+<!DOCTYPE HTML>
+<HTML>
+
+<body>
+
+
+<h1>Test</h1>
+<p>.....................................................................</p>
+<p>...............</p>
+<p>...............</p>
+    <!-- using forms and submitting -->
+    <!-- using $Get(%request.Data) to get values submitted from the form -->
+    <!-- form to pass data to a cls class -->
+<form name="myForm" action="main.csp" method="GET"> <!--onsubmit="return false;">-->
+    <label for="name">Name</label>
+    <input type="text" id="name">
+    <label for="name">Email</label>
+    <input type="text" id="email">
+    <label for="name">Gender</label>
+    <input type="text" id="gender"> <br><br>
+    <input type="SUBMIT" name="BUTTON1" value="Submit form"> <br><br>
+
+	<input type=checkbox name=completed value="333">Completed
+	<input type=checkbox name=active value="1"><input type=hidden name=active value="0">Active
+    <button type="submit" onclick="submitData()">Submit Data</button>
+</form>
+
+<button type="submit" onclick="#server(..CompletedBoxTest())#">Completed Btn</button>
+<script language="Cache" runat="SERVER">
+   // test for a submit button
+   If ($Data(%request.Data("BUTTON1",1))) {
+      Write $Get(%request.Data("completed", 1)) // should show 333 which is the value for completed
+   }
+</script>
+
+<script language=cache method=SelectOptions arguments="CurrentValue:%String" returntype="%String" procedureblock>
+	/// Creates options for a dropdown;
+	
+	Set Result="<option value="""">&nbsp;</option>"_$$$EOL
+	Set rs=##class(%ResultSet).%New()
+	Set sc = rs.Prepare("SELECT ID, Email FROM Mentor.Author ORDER BY Name || Email") // ordering bu res of concatenating Name and Email 
+	Set sc=rs.Execute()
+	While rs.Next() {
+		Set ID=..EscapeHTML(rs.Get("ID"))
+		Set Name=..EscapeHTML(rs.Get("Name"))
+		Set Email=..EscapeHTML(rs.Get("Email"))
+		Set Result=Result_"<option value="""_ID_""""
+		If Name=CurrentValue Set Result=Result_" selected"
+		Set Result=Result_">"_Name_" "_Email_"</option>"_$$$EOL
+	}
+	Quit Result
+</script>
+
+<p>...............</p>
+	<script language="cache" runat="Server">
+        set User = $username
+    </script>
+       
+    <p>#(User)#</p>
+<p>...............</p>
+<p>...............</p>
+    <!-- calling a cache function directly from the button onclick html -->
+    <button class="btn btn-primary" onclick="#server(..testData())#">Call Cache Method#</button>
+
+    <script language="cache" method="testData" returntype="%Status">
+
+        Write "dd"
+
+        Return 1
+    </script>
+<p>...............</p>
+    <!-- Internal Server Error -->
+    <!-- Can happen if you miss to send appropriate data to method, from where method is called -->
+    <!-- Send data and receive data, all through arguments -->
+<p>...............</p>
+<p>...............</p>
+    <!-- remove certain write "..." statements before return in cache, this can return null in JS -->
+<p>...............</p>
+<p>...............</p>
+<!--
+    Research about the following: Put at the top of the page
+
+    <csp:class super="App.Utilities.CSP.Admin">
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+    <html>
+    <head>
+    <title>TKID</title>
+    <link rel="stylesheet" type="text/css" href="../../res/common.css">
+    <link rel="stylesheet" type="text/css" href="../../res/details.css">
+    ....
+
+-->
+<p>...............</p>
+<p>...............</p>
+<!--
+    Research about the following
+    Set Type = $ZStrip(%request.Get("Name"), "<>W")
+-->
+<p>...............</p>
+<p>...............</p>
+<!--
+    Research about the following
+    Set ^||Identifier("Book") = "BookId"
+    ...
+-->
+<p>...............</p>
+<p>...............</p>
+<!--
+    // Learn configuring roles in your app 
+    If (($Roles'["User") && ($Roles'["Admin")) Set %response.ServerSideRedirect="../../e403.csp" Quit 1
+-->
+<p>...............</p>
+<p>...............</p>
+<!--
+    // Learn using ListBuild
+    
+    set BookAuthor = ##(Mentor.BookAuthor).%New()
+	Set book.Author=$ListBuild(
+		$ListBuild("Date", "HistDate", "datetime"),
+		$ListBuild("Action", "Action", "select", $ListFromString("Change,Insert,Delete")),
+		$ListBuild("User", """User"""),
+		$ListBuild("Data", "Data", "Name", %request.Get("Name"), %request.Get("Type"))
+		)
+-->
+<p>...............</p>
+<p>...............</p>
+<!--
+// Calling Queries
+
+    Cache method
+    <script language=cache method=OnPreHTTP returntype="%Boolean>
+        If (($Roles'["User") && ($Roles'["Admin")) Set %response.ServerSideRedirect="../../e403.csp" Quit 1
+        
+        Set sc=..GetResultSet(.rs)
+    </script>
+    <script language=cache method=GetResultSet arguments="*rs:%ScrollableResultSet" returntype="%Status" procedureblock>
+        Set Query=..BuildQuery()
+    </script>
+
+    // Cache
+    <script language=cache method=BuildQuery arguments="" returntype="%String" procedureblock>
+        Set Query="SELECT  * FROM Mentor.Book "
+        Set Query=Query_"WHERE Name='"_%request.Get("Name")_"' "
+        Set Query=Query_"ORDER BY Name DESC"
+
+        Quit Query
+    </script>
+-->
+<p>...............</p>
+    <input type=hidden name=Package value="#(..EscapeHTML(%request.Get("Package")))#">
+    <input type=hidden name=Package value="#(..EscapeHTML(%request.Get("Name")))#">
+
+    Research on %request.Get()
+    <script language=cache method=GetType arguments="Type:%String, Show:%Boolean" returntype="%String" procedureblock>
+	Set GetType=$Case($ZConvert(Type, "L"),
+        				"Name": "FirstName",
+        				"NameIsValid": "FirstName Is Valid",
+        				: "Onbekend")
+    
+    Quit GetType
+ </script>
+<p>...............</p>
+<p>...............</p>
+    <!-- Checking if rs set exists -->
+    Set tSC = ##class(%SQL.Statement).%ExecDirect(,"SELECT 1 FROM Mentor.BookAuthor WHERE ID = '1'")
+    if tSC.%Next(){ 
+        Write "exists"
+    } else {
+        Write "Does not exist"
+    }
+<p>...............</p>
+<p>...............</p>
+    <!-- Iterating through Dynamic arrays -->
+    
+    Set result = {"ID":"1","Name":"Isaac N","Email":"isaac@gmail.com","Gender":"Male","BooksValue":[{"Name":"How to be one with oneself"}, {"Name":"How to make money"}]}
+    <!-- BooksValue is of type %Libray.DynamicArray -->
+    <!-- To get first book use index position eg 0 in this case as the below: -->
+    Write result.BooksValue.%Get(0).Name
+
+    <!-- To get all books use for all positions, use the below: -->
+    Set booksArray = result.BooksValue
+
+    Set iterator = booksArray.%GetIterator()
+    While iterator.%GetNext(.key, .obj){
+        Write "key: ", key, " key end" // key = 0,1,2.... its the index position
+        Write "obj: ", obj.Name, " obj end" // obj = object, use it to access the obj properties
+    }
+<!-- -->
+<p>...............</p>
+<p>...............</p>
+    <!-- Once something is Set using object script its converted to Libray object -->
+    <!-- To use it as normal string, convert it back. Then the dot operator can start working -->
+    Set tempString = {"ID":"1","Name":"Isaac N","Email":"isaac@gmail.com","Gender":"Male"}
+    write tempString.%ToJSON()
+    write tempString.Name
+<p>...............</p>
+<p>...............</p>
+    <!-- With a bridger, since it contains Author column and Book column -->
+    Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT * FROM Mentor.BookAuthor WHERE Author = '1'")
+    <!-- rs contains rs.Author and rs.Book -->
+    <!-- Result sets above returns ID, actual Object, you cannot do .Prop (rs.Author.Name) -->
+    <!-- Instead, use returned ref and open actual object using openID (openId(res.Author)) -->
+    
+    <!-- Check the below Example -->
+    Set ID = "1"
+    Set author = ##Class(Mentor.Author).%OpenId(ID)
+
+    If (author '= "") {
+        Set result = {}
+        set result.ID = ID // do not do author.ID because ID is not a class property of Author
+        set result.Name = author.Name
+        set result.Email = author.Email
+        set result.Gender = author.Gender
+
+        Set author2 = ##Class(Mentor.BookAuthor).%OpenId(1) 
+        Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT * FROM Mentor.BookAuthor WHERE Author = '1'")
+        While rs.%Next() {
+            Write !, " ...The Book Ref: ", rs.Book, !
+            Write !, " ...The Author Ref: ", rs.Author, !
+            Write !, " ...The Author2: ", author2.Author, !
+        }
+    }
+
+    <!-- Notes -->
+    <!-- End of Notes -->
+
+<p>...............</p>
+<p>...............</p>
+<script language="cache" runat="Server">
+    #; querying data and returning a resultset, use loops to iterate
+    Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT * FROM Mentor.Book WHERE ID='5'")
+    While rs.%Next() {
+        Write !, "ID: ", rs.ID, !!
+        Write "Name: ", rs.Name, !
+    }
+    
+    #; Checking for a specific ID using Name then storing returned ID into new variable ID
+    Set booksValue = "New Paradisessssssssssssssssssss"
+    &SQL(
+        Declare SC Cursor 
+        For SELECT ID INTO :ID
+        FROM Mentor.Book
+        WHERE Name=:booksValue
+    )
+    &SQL(Open SC)
+
+    Quit:(SQLCODE'=0)
+    IF SQLCODE<0 { WRITE "SQLCODE error ",SQLCODE," ",%msg  QUIT }
+    ELSEIF SQLCODE=100 {WRITE "Author not found"  QUIT}
+</script>
+<p>...............</p>
+<select id="booksDropdown">
+    #(..GetBooks())#
+</select>
+/* <script language="cache" method="GetBooks" returntype="%Boolean">
+    while (Books.Next()) {
+        Write "<option>"_Books.ID_" "_Books.Name_"</option>"
+    }
+    Return $$$OK
+</script>*/
+<p>...............</p>
+<p>...............</p>
+<p>...............</p>
+<!-- Using dictionaries in Object Script -->
+<!-- Initialize the associative array -->
+Set existingBookTitles = []
+
+// Populate the associative array with keys
+Set existingBookTitles("Book1") = 1
+Set existingBookTitles("Book2") = 1
+Set existingBookTitles("Book3") = 1
+
+// Iterate and display the keys
+Set key = ""
+For {
+    Set key = $Order(existingBookTitles(key))
+    If key = "" Quit  // Exit the loop when there are no more keys
+    Write "Key: ", key, !
+}
+<p>...............</p>
+<p>...............</p>
+<p>...............</p>
+<!-- Use count only on relationship Objects (author.Bridge.Count()) not a normal object eg author --> 
+write authorOne: 14@%Library.RelationshipObject
+write authorTwor: 17@Mentor.Author
+
+write authorOne.Count() works, but write authorTwo.Count() doesn't work 
+<!-- displaying resultset -->
+oref.%Display()
+<p>...............</p>
+<!-- set books = ##class(Mentor.Book).GetAllBooksFunction()  --> 
+<!-- is the same as  -->
+<!-- <csp:query name="Books" classname="Mentor.Book" queryname="GetAllBooks"></csp:query> -->
+
+<!-- the other is for accessing a query and the other for accessing a function -->
+
+<csp:query name="Books" classname="Mentor.Book" queryname="GetAllBooks"></csp:query>
+
+<script language="cache" method="GetBooks" returntype="%Boolean">
+    // set books = ##class(Mentor.Book).GetAllBooks() // no need since we are using a query
+    while (Books.Next()) {
+        Write "<option>"_Books.Name_"</option>"
+    }
+    Return $$$OK
+</script>
+
+<p>...............</p>
+    <!-- Doing dropdowns -->
+    
+    <csp:query name="Books" classname="Mentor.Book" queryname="GetAllBooks"></csp:query>
+    
+    <!-- method 1 -->
+    Select Book
+    <select name="">
+        <csp:while condition="Books.Next()">
+            <option>#(Books.Get("Name"))#</option>
+        </csp:while>
+    </select>
+
+    <!-- method 2 -->
+    <script language="cache" method="GetBooks" returntype="%Boolean">
+        // set books = ##class(Mentor.Book).GetAllBooks()
+
+        while (Books.Next()) {
+            Write "<option>"_Books.Name_"</option>"
+        }
+        Return $$$OK
+    </script>
+    
+    Select Book
+    <select name="2">
+        #(..GetBooks())#
+    </select>
+<p>...............</p>
+    <!-- Json Data -->
+    result.%ToJSON() results into {"ID":"12", "Name":"test"}
+        : good for APIs, and data exchange between systems
+    To use result.Name you have to convert the string back to object as follows
+        JSON.parse(result) => {ID: '12', Name: 'test'}
+        : now result.Name is available
+
+    NB: Conversely, you can use JSON.stringify() to convert JavaScript objects into JSON strings.
+<p>...............</p>
+
+<!-- Method to get author details by ID -->
+
+<!-- Also a json object is easy to work with outside cls -->
+<!-- when returning 1 result author.%Next() does not work unless its a queryset -->
+
+<!-- author.ID gives errors -> ID is not a class property of Author, set a new result object -->
+ClassMethod GetAuthorDetails(ID As %String) As %Status
+{
+    Set author = ##Class(Mentor.Author).%OpenId(2)
+    If (author '= "") {
+        Set result = {}
+        set result.ID = ID // do not do author.ID because ID is not a class property of Author
+        set result.Name = author.Name
+
+        #; #; set result.Email = author.Email
+        #; #; set result.Gender = author.Gender
+    }
+    return result.%ToJSON()
+}
+<p>...............</p>
+<!-- following method is called in the page, and receives an argument also -->
+<script language="Cache" method="MakeList" arguments="count:%Integer" returntype="%String">
+    Write "<ol>",!
+    New i
+    For i = 1:1:count {
+        Write "<li> Item",i,!
+    }
+    Write "</ol>",!
+    Quit ""
+</script>
+
+<!-- Display the generated list -->
+<div>
+    <h3>Generated List:</h3>
+    #(..MakeList(5))#
+    <!-- #(server(..serverTest("33")))# -->
+</div>
+<p>...............</p>
+<!-- the following is called in the js, and receives an argument also -->
+<script language="Cache" method="MakeList" arguments="count:%String" returntype="%Status">
+    return count
+</script>
+<p>...............</p>
+<!-- we can call the above method directly on a button or in the js as shown below -->
+
+<!-- <button class="btn btn-primary cst-btn" onclick="#server(..MakeList(2))#">Hey there btn</button> -->
+<button class="btn btn-primary cst-btn" onclick="handleMakeList('hey')">Hey there btn</button>
+
+<script language="javascript">
+    function handleMakeList(number) {
+        console.log('number', number);
+        //#server(..MakeList(number))#
+        let res = #server(..MakeList(number))#
+        console.log('res: ', res);
+    }
+</script>
+
+
+<p>...............</p>
+<!-- the following creates:
+                        arr = Dynamic Array (#####@%Library.DynamicArray)
+                        obj = Dynamic Object (#####@%Library.DynamicObject)
+Both can not work in JS functions and most manipulations outside CLS methods so:
+                        convert them to %ToJSON()
+                            1 - You can convert 1 object
+                            2 - You can convert an array with multiple objects
+-->
+<script language="cache" runat="Server">
+    set obj = {}
+    set obj.ID = Authors.ID
+    set obj.Name = Authors.Name
+    // set obj.Email = Authors.Email
+    // set obj.Gender = Authors.Gender
+
+    set arr = []
+    Do arr.%Push(obj)
+
+    set resJSON = arr.%ToJSON()
+    set objJSON = obj.%ToJSON()
+</script>
+<p>res: #(arr)#</p> <!-- this shows a dynamic array -->
+
+<button class="btn btn-primary cst-btn" onclick="editAuthorJs(resultArrJs, resultObjJs)">Edit</button>
+
+<script language="javascript">
+    let resultArrJs = #(resJSON)# // converting process
+    let resultObjJs = #(objJSON)# // converting process
+    console.log("resultJs ", resultArrJs); // converted
+    console.log("resultObj ", resultObjJs); // converted
+
+
+    function editAuthorJs(authorID, resultArrJs, resultObjJs) {
+        $('#modal').modal('show');
+        let res = #server(Mentor.Author.GetAuthor())# // calling class
+        // let res = #server(Mentor.Author.GetAuthorDetails(authorID))#
+        
+        //let res = #server(Mentor.Author.GetAuthorDetails(2))#
+        console.log('author-ID: ', authorID);
+        console.log('res: ', res);
+        // console.log('resultArrJs: ', resultArrJs);
+        // console.log('resultObjJs: ', resultObjJs.Name);
+        // document.getElementById('name')
+    }
+
+</script>
+<p>...............</p>
+<!-- calling a server side class in the client's cache code -->
+<script language="cache" method="OnPreHTTP" returntype="%Boolean">
+    #DIM res As Mentor.Author
+    Set res = ##Class(Mentor.Author).AddShow("test") // calling class
+    #DIM res As %Integer
+    Set num = ##Class(Mentor.Author).AddShow("test")
+
+    return res
+</script>
+<!-- displaying the res on page -->
+<p>res: #(res)#</p>
+<p>...............</p>
+<!-- method to save to DB being given values from the below Javascript script portion 
+ClassMethod AddShow(name As %String, email As %String, gender As %String) As %Status
+{
+    Set author = ##class(Mentor.Author).%New()
+    Set author.Name = name
+
+    Try {
+        Set status = author.%Save()        
+    }
+    Catch (err) {
+        Set %response.Status = 500
+        return {"errormessage":"Server Error"}
+    }
+
+    Return $$$OK
+}
+
+method to set form values on the client side 
+ClassMethod AddShow2(name As %String) As %String
+{
+    #; Return result.%ToJSON()
+    #; Write name
+    Return name.%FromJSON()
+}
+-->
+<script language="javascript">
+    function submitData() {
+        // setting form values in js function, the value is from a cls method
+        document.getElementById('name').value = #server(Mentor.Author.AddShow2(200))#
+        document.getElementById('email').value = #server(Mentor.Author.AddShow2("example email"))#
+        document.getElementById('gender').value = #server(Mentor.Author.AddShow2("example gender"))#
+
+        // setting local values by values from the form then sending those values to a cls method
+        // the cls method then saves to the DB 
+        let name= document.getElementById('name').value
+        let res = #server(Mentor.Author.AddShow(name))# // you can email, gender etc
+    }
+</script>
+<p>...............</p>
+<!-- in the cache classes we have  -->
+ClassMethod AddShow() As %Integer
+{
+    Set mynumber = 1000
+    Return mynumber
+}
+
+// At client side we can assign the returned value to a new variable -->
+<script language="cache" method=Global returntype="%Status">
+    Set ^x(1)=1
+    Set ^x(4)=2
+    Set ^x(9)=3
+    
+    // Order returns the next valid subscript
+    Write "Order after x(""): ", $ORDER(x("")), ! // Output: Order after x("): 1
+    Write "Order after x(1): ", $ORDER(x(1)), ! // Output: Order after x(1): 3
+    Write $ORDER(x(""), -1) // reversal tranversal
+
+    // To retrieve subscript plus the value stored in that location
+    Set a = $order(x(4)), b = x(a) Write a, "   ", b 
+    // Output: 9   3
+    kill ^x
+
+    return 1
+</script>
+
+// At client side we can assign the returned value to a new variable -->
+<script language="cache" method=OnPreHTTP returntype="%Boolean">
+    #DIM res As Mentor.Author
+    Set res = ##Class(Mentor.Author).AddShow()
+    return true
+</script>
+res: #(res)#
+<p>.....................................................................</p>
+<!-- To return objects, always return converted JSON, for simple objects not the resultset -->
+ClassMethod AddShow() As %String
+{
+    Set sc = 1000
+    Set obj = ##class(Mentor.Author).%New()
+    set obj.Name = "Isaac"
+    
+    // Construct a simple object with relevant data
+    Set result = {}
+    Set result.Name = obj.Name
+    Set result.Status = "Success"
+    
+    // Convert the object to a JSON string and return it
+    Quit result.%ToJSON()
+}
+<p>.....................................................................</p>
+<script language="cache" runat="server">
+    set x = 10
+</script>
+<script language="cache" runat="server">
+    set y = 20
+    set authorID = "2"
+</script>
+
+<p>X + Y is #(x + y)#</p> // making a calulation with variables in the script -->
+<p>Y is #(y)#</p> // calling an integer variable set in the script -->
+<p>Author ID is #(authorID)#</p> // calling a string variable set in the script -->
+
+// Sending query parameters to a cls pre-defined class above: use p1, p2...not custom words -->
+<csp:query name="Author" classname="Mentor.Author" queryname="GetAuthor" p1=#(authorID)#>
+    <p>X + Y is #(x + y)#</p>
+    <csp:while condition="Author.Next()">    
+        <p>Name: #(Author.Name)#</p>
+        <p>Author ID: #(Author.ID)#</p>
+    </csp:while>
+</csp:query>
+<p>.....................................................................</p>
+<csp:query name="Author" classname="Mentor.Author" queryname="GetAuthor">
+    <csp:param name="ID" value="2" />
+    
+    <p>X + Y is #(x + y)#</p>
+    <csp:while condition="Author.Next()">    
+        <p>Name: #(Author.Name)#</p>
+        <p>Author ID: #(Author.ID)#</p>
+    </csp:while>
+</csp:query>
+<p>.....................................................................</p>
+<csp:query name="Authors" classname="Mentor.Author" queryname="GetAllAuthors">
+<csp:while condition="Authors.Next()">
+    <p>#(Authors.ID)#</p>
+    <p>#(Authors.Name)#</p>
+</csp:while>
+</csp:query>
+<p>.....................................................................</p>
+<csp:query name="Books" classname="Mentor.Book" queryname="GetAllBooks">
+    <csp:while condition="Books.Next()">
+        <p>#(Books.ID)#</p>
+        <p>#(Books.Name)#</p>
+    </csp:while>
+</csp:query>
+<p>.....................................................................</p>
+<p>.....................................................................</p>
+$PROPERTY (Instance, PropertyName ) //gets / sets a value of a prop in an instance of a class.
+
+SET nlsoref=##class(%SYS.NLS.Locale).%New()
+WRITE $PROPERTY(nlsoref,"Language")
+<p>.....................................................................</p>
+..#<Parameter> Syntax
+Parameter MyParam = 22;
+
+ClassMethod WriteMyParam() { Write ..#MyParam }
+
+<p>.....................................................................</p>
+Instance variables override an accessor method for a property. Every property internally has one
+i%<PropertyName> Syntax
+<p>.....................................................................</p>
+
+<!-- Task -->
+
+<!-- TODO: Help Isaac and myself learn this shit -->
+<!-- FIXME: Isaac try solve this -->
+<!-- <csp:query name="Author" classname="Mentor.Author" queryname="GetAuthorByName">
+    <csp:parameter name="Name" value='{%request.Get("User")}' />
+</csp:query>
+
+<csp:while condition="Author.Next()">
+<p>AUT #(Author.Name)#</p>
+</csp:while> -->
+
+<p>...............</p>
+    <csp:query name="Authors" classname="Mentor.Author" queryname="GetAllAuthors">
+        <csp:while condition="Authors.Next()">
+            <p>#(Authors.Get("ID"))#</p>
+            <p>#(Authors.Get("Name"))#</p>
+            <p>#(Authors.Name)#</p>
+            <script>// console.log('hey: ', #(Authors.Get("Name"))#)</script>
+            <csp:query name="singleAuthor" classname="Mentor.Author" queryname="GetAuthor" p1=#(Authors.Get("ID"))#>
+                <csp:while condition="singleAuthor.Next()">
+                    <!-- #(Author)# -->
+                    <!-- #((Author).Name)# -->
+                    <!-- // set authorID = "2" -->
+                    <!-- // set obj = ##class(Mentor.Author).%New() -->
+                    <!-- // Set obj.Name = #((Author).Name)# -->
+                    <button class="btn btn-primary cst-btn" onclick="editAuthor(#(singleAuthor.ID)#)">Edit New</button>
+                    <button class="btn btn-primary cst-btn" onclick="openEditModal(#((singleAuthor).Name)#)">Edit</button>
+                    <p>single Name: #(singleAuthor.Get("Name"))#</p>
+                    <p>Author ID: #(singleAuthor.ID)#</p>
+                </csp:while>
+            </csp:query>
+        </csp:while>
+    </csp:query>
+    <p>...............</p>
+
+</body>
+
+</HTML>
+
+

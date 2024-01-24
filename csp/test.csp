@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- outputing a variables in the Http/method response-->
+    #(res1)#
+    #(name)#
+    #(n)#
+    <!--#(res2)#-->
+
+    <table>
+        <th>Sorteren op:</th>
+        <td id="search">#(..ColumnSelect("Sort"))# 
+    <table>
+
+
+    <script language="cache" method="OnPreHTTP" returntype="%Boolean">
+        #DIM res1 As Mentor.Utilities
+        Set res1 = ##Class(Mentor.Utilities).AddShow("test")
+        Set name = ##Class(Mentor.Utilities).AddShow("Isaac")
+        Set n = ..testData("Newest-testing")
+
+        return 1
+    </script>
+
+    <!-- calling a cache function directly from the button onclick html -->
+    <button class="btn btn-primary" onclick="#server(..testData())#">Call Cache Method#</button>
+
+    <script language="cache" method="ColumnSelect" arguments="Name:%String" returntype="%Status">
+        S Result = 1, list=""
+        Set Values = $LISTBUILD(
+            $LISTBUILD("ID", "ID", "String"),
+            $LISTBUILD("Name", "Name", "String"),
+            $LISTBUILD("Email", "Email", "String"),
+            $LISTBUILD("Gender", "Gender", "String")
+        )
+
+        // S Values = ", zan, apple, orange, zan2, banana, appricot"
+        // S list=##class(Mentor.Utilities).SortList(Values)
+        S list=##class(Mentor.Utilities).SortList($LISTToString(Values, ","))   
+        W !, "---------"
+
+        W $LISTToString(Values, ","), !
+
+        Write "Sorted Columns: ", list, !, "EOCols", !
+        
+        S Result = 1
+
+        /*
+        For {
+            Set ColumnName = $ORDER(Values, ColumnName)
+            Quit:(ColumnName = "")
+
+            //Set SortedColumns = SortedColumns _ $LISTBUILD($LIST(Values, ColumnName))
+            //Set SortedColumns = SortedColumns _ $LISTBUILD($LISTGET(Values, ColumnName))
+        }
+
+        Write "Sorted Columns: ", SortedColumns, !, "EOCols", !
+
+        Write "Columns: ", Values
+        Set Result = "<select name="_Name_"><option value="""">&nbsp;</option>"
+
+        write "hey there"_Values
+        For tlr = 1:1:$ListLength(Values) {
+            Set Data = $ListGet(Values, tlr), Value=$ListGet(Data, 2), Display = $ListGet(Data, 1)
+            ;Set Display = $ZCONVERT(Display, "L")
+            Set Result = Result_"<option value = """_$ZConvert(Value,"O","HTML")_""""
+            If %request.Get(Name) = Value Set Result = Result_" selected"
+            Set Result = Result_">"_$ZConvert(Display, "O", "HTML")_"</option>"
+        }
+
+        Set Result = Result_"</select>"
+        */
+
+        Quit Result
+
+    </script>
+
+    <script language="cache" method="testData" arguments="SentData:%String" returntype="%Status">
+        Set res2 = ##Class(Mentor.Utilities).AddShow(SentData)
+        Write "dd"
+
+        Return res2
+    </script>
+</body>
+</html>

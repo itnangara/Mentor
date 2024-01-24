@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Ordered List</title>
+</head>
+<body>
+<h2>Component from a different page</h2>
+<csp:include page="form.csp"/><!-- Component from a different page -->
+
+<!-- form to pass data to a cls class -->
+<form name="myForm" action="main.csp" method="POST"> <!--onsubmit="return false;">-->
+    <label for="name">Name</label>
+    <input type="text" id="name">
+    <label for="name">Email</label>
+    <input type="text" id="email">
+    <label for="name">Gender</label>
+    <input type="text" id="gender"> <br><br>
+    <input type="SUBMIT" name="BUTTON1" value="Submit form"> <br><br>
+
+    <select name="dropdown">
+            <option value="option1">opt 1</option>
+            <option value="option2">opt 2</option>
+            <option value="option3">opt 3</option>
+    </select>
+
+    <br><br> Subscription Status: #(..StatusDropdown("Status"))# <br><br>
+
+	<input type=checkbox name=completed value=222>Completed
+	<input type=checkbox name=active value="1"><input type=hidden name=active value="0">Active
+    <button type="submit" onclick="submitData()">Submit Data</button>
+</form>    
+
+
+<button type="submit" onclick="#server(..CompletedBoxTest())#">Completed Btn</button>
+<br>
+<br>
+<br>
+
+#(..doubleTest("Sort"))#
+#(..doubleTest2("Sort"))#
+<br>
+<br>
+-------- muti part -------------
+<br>
+<br>
+#(..Multidimensional("sort"))#
+
+<br>
+
+<script language=cache method=Multidimensional arguments="Name:%String" returntype="%Status" procedureblock>
+    set sorted = ##class(Mentor.Utilities).Multidimensional()
+
+    write sorted
+    
+    Quit 1
+</script>
+
+<script language=cache method=doubleTest2 arguments="Name:%String" returntype="%Status" procedureblock>
+    set alphabet(0)="B" 
+    set alphabet(1)="Z"  
+    set alphabet(2)="A"  
+    set alphabet(3)="C"
+
+    //write "alphabet: "_alphabet(0), !, "br"
+    //write "alphabet: "_alphabet(1), !, "br"
+    //write "alphabet: "_alphabet(3), !, "br"
+
+    set subscript = ""
+    while $order(alphabet(subscript), 1, subscript) {
+        write "testing 1"
+        write "alphabet(", subscript, ") = ", alphabet(subscript), !  // Output each subscript and its value
+    }
+
+    // Check if the dynamic array is defined
+if $data(alphabet) {
+    // Loop through all subscripts and display values
+    write "testing 2"
+    set subscript = ""
+    while $order(alphabet(subscript), 1, subscript) {
+        write "testing 3"
+        write "alphabet(", subscript, ") = ", alphabet(subscript), !  // Output each subscript and its value
+    }
+} else {
+    write "The dynamic array 'alphabet' is not defined.", !
+}
+
+    Quit $$$OK
+</script>
+
+<script language=cache method=doubleTest arguments="Name:%String" returntype=%Status procedureblock>
+    Set Result = "<select name=" _ Name _ ">"
+
+    set list = ",Banana,Juice,Apple,Maheu,Sadza,Drink,Pap"
+    Set sortedList = ##class(Mentor.Utilities).SortList(list)
+    
+    write "my sorted list is: "_sortedList
+    ;Values are the actual column names, displays what to display in the column header (initially equal)
+    Set Values=$ListBuild(
+        $ListBuild("1st", "first"),
+        $ListBuild("3rd", "third"),
+        $ListBuild("2nd", "second"),
+        $ListBuild("4th", "forth"),
+        $ListBuild("8th", "eigth"),
+        $ListBuild("9th", "nineth"),
+        $ListBuild("11th", "eleventh"),
+    )
+    
+    Set Result=Result_"<option value="""">&nbsp;</option>"
+
+    For i = 1 : 1 : $ListLength(Values) {
+        Set Data = $ListGet(Values,i), Value = $ListGet(Data,1), Display = $ListGet(Data,2)
+        Set Result = Result _ "<option value=""" _ $ZConvert(Value,"O","HTML") _ """"
+        If %request.Get(Name) = Value Set Result = Result _ " selected"
+        Set Result = Result _ ">" _ $ZConvert(Display,"O","HTML") _ "</option>"
+    }
+
+    Set Result = Result _ "</select>"
+    
+
+    Quit Result
+</script>
+
+<script language=cache method=StatusDropdown arguments="Name:%String" returntype="%String" procedureblock>
+	Set Result="<select name="_Name_">"
+
+	Set Values=$ListBuild(
+		$ListBuild("All", "Show All"),
+		$ListBuild("Active", "Show Active"),
+		$ListBuild("InActive", "Show InActive"),
+	)
+
+	For i=1:1:($ListLength(Values)-1) {
+		Set Data=$ListGet(Values, i), Value=$ListGet(Data, 1), Display=$ListGet(Data, 2)
+		Set Result=Result_"<option value="""_$ZConvert(Value,"O","HTML")_""""
+		If %request.Get(Name)=Value Set Result=Result_" selected"
+		Set Result=Result_">"_$ZConvert(Display, "O", "HTML")_"</option>"
+	}
+
+	Set Result=Result_"</select>"
+
+	Quit Result
+</script>
+
+<script language="cache" runat="server">
+    Set newVAr = %request.Get("dropdown")
+    write "<br>"
+    write "new variable: "_newVAr
+</script>
+<script language="cache" method="CompletedBoxTest" arguments="" returntype="%String">
+	Set newVAr = %request.Get("dropdown")
+    Set newVAr3 = %request.Get("Name")
+    Set newVAr2 = %request.Get("SearchColumn")
+    Write "new variable: ", %request.Get("SearchColumn")
+
+	//Set completed = %request.Get("completed")
+    
+    //write "completed reached: "_completed
+	//Set active = %request.Get("active")
+	//Set inactive = %request.Get("inactive")
+    return 1
+</script>
+
+<script language="javascript">
+    function submitData() {
+        // setting form values in js function, the value is from a cls method
+        // document.getElementById('name').value = #server(Mentor.Author.AddShow(200))#
+
+        let author = {Name:'isaac Nangara'}
+        let name= document.getElementById('name').value
+        let email= document.getElementById('email').value
+        let gender= document.getElementById('gender').value
+        let res = #server(Mentor.Author.AddShow(name, email, gender))#
+        console.log('Object: ', res);
+        // let n = "sasjj"
+        // let res2 = #server(Mentor.Author.AddShow2('hhs'))#
+        // console.log('String: ', res2);
+        // console.log('Object: ', author);
+    }
+</script>
+
+<!-- the following is called in the page, and receives an argument also -->
+<script language="Cache" method="MakeList" arguments="count:%Integer" returntype="%String">
+    Write "<ol>",!
+    New i
+    For i = 1:1:count {
+        Write "<li> Item",i,!
+    }
+    Write "</ol>",!
+    Quit ""
+</script>
+
+<!-- Display the generated list -->
+<div>
+    <h3>Generated List:</h3>
+    #(..MakeList(5))#
+    <!-- #(server(..serverTest("33")))# -->
+</div>
+
+<!-- the following passes data to a cls class onclick event -->
+<a href=. onClick="#server(Mentor.Author.AddShow(100))#;return false;">hey click me</a>
+
+<!-- triggers serverTestCaller javascript function -->
+<button onclick="serverTestCaller()">serverTest Click</button>
+
+<!-- the following returned number is passed in through arguments from a javascript function -->
+<script language=cache method="serverTest" arguments="number:%Integer" returntype="%String">
+    return number
+</script>
+
+<!-- the function invokes and sends a number to the cache class -->
+<script language="Javascript">
+    function serverTestCaller() {
+        let num = 200;
+        let res = #server(..serverTest(num))#
+        console.log('serverTestCaller called: ', res);
+    }
+</script>
+
+</body>
+</html>

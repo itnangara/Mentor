@@ -1,0 +1,19 @@
+    <script language="cache" arguments="ID:%String" method="testDelete">
+        Try {
+            if (ID '= "") {
+                
+                Set author = ##class(Mentor.Author).%OpenId(ID)
+                Set bookAuthorList = author.Bridge
+                Write "Name: ", bookAuthorList.Count()
+
+                //Set bookAuthor = ##class(Mentor.BookAuthor).%OpenId(ID)
+                //Write bookAuthor
+                //set status = ##class(Mentor.Author).%DeleteId(ID)
+            }
+        }
+        Catch err {
+            set %response.Status = 500
+            return {"error message":"Server Error"}
+        }
+        return $$$OK
+    </script>

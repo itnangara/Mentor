@@ -1,0 +1,11 @@
+table {
+    margin-top: 10px;
+    border-collapse: collapse;
+    width: 100%;
+}
+.btn {
+    color: white;
+}
+.header {
+    text-align: center;
+}

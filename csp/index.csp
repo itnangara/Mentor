@@ -1,0 +1,566 @@
+<!DOCTYPE HTML>
+<HTML>
+    <head>
+        <title>Author List</title>
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    </head>
+
+    <body>
+
+        <button class="btn btn-primary cst-btn" onclick="handleMakeList('hey')">Hey there btn</button>
+
+
+        <script language="cache" runat="server">
+        set list = ",Banana,Juice,Apple,Maheu,Sadza,Drink,Pap"
+        //Set sortedList = ##class(Mentor.Utilities).SortList(list)
+        //write list
+        Set sortedList = ##class(Mentor.Utilities).TestMeth(list)
+        write sortedList
+        Set check = ##class(Mentor.Utilities).CheckLimit(list)
+
+        write check
+        if check {
+            write "exeeded"
+        } else {
+            write "not exeeded"
+        }
+
+        //return sortedList
+        /*Set items = ",Banana,Juice,Apple"
+
+
+        Set items = ",Banana,Juice,Apple, Maheu, Sadza, Drink, Pap"
+        Set arr = ["Banana", "Juice", "Apple", "Maheu", "Sadza", "Drink", "Pap"]
+
+        //Set p = SORT(arr)
+        Set p = $ORDER(arr(""))
+        // Convert the string to an array (list)
+        Set fruitsArray = $LISTFROMSTRING(items, ",")
+        //write fruitsArray
+        write "p"
+        write p
+        write "p"
+
+        Set n = $Length(items, ",")
+
+        Write !, "number of items: ", n, !
+        write items
+        Write "my sorted", !
+        For i=1:1:n {
+            //write items(i)
+            //Write "jjjjjjjjjjjjj"   // shows every element
+            //Write $Piece(items, ",", i), !
+            For j=1:1:n-i{
+                //Write $Piece(items, ",", i), !   // shows every element
+                //Write "jjjjjjjjjjjjj"   // shows every element
+                If $ASCII($Piece(items, ",", j)) > $ASCII($Piece(items, ",", j+1)) {
+                    //Write $Piece(items, ",", j), !   // shows every element
+                    Set temp = $Piece(items, ",", j)
+                    Set $Piece(items, ",", j) = $Piece(items, ",", j+1)
+                    Set $Piece(items, ",", j+1) = temp
+                }
+            }
+        }
+
+        /*kill sorting
+        for x=1:1:$length(list,",") {// Assuming comma-separated list in string
+        set sorting($piece(list,",",x)
+        }
+        set k="", li="" 
+        
+        for {set k=$order(sorting(k)
+        quit:k=""
+        set li=li_$listbuild(k)
+        }
+        quit $listtostring(li,",")
+
+        write items
+
+        Write "my sorted"
+        // Bubble sort implementation
+        //For i = 1 To $LENGTH(fruitsArray) - 1 {
+        /*For i=1:$Length(fruitsArray) - 1 {
+            For j = 1:$LENGTH(fruitsArray) - i {
+                Set fruit1 = $LIST(fruitsArray, j)
+                Set fruit2 = $LIST(fruitsArray, j + 1)
+
+                // Custom comparison logic using "]", you may adjust it as needed
+                If $ASCII(fruit1) > $ASCII(fruit2) {
+                    Set temp = fruit1
+                    Set $LIST(fruitsArray, j) = fruit2
+                    Set $LIST(fruitsArray, j + 1) = temp
+                }
+            }
+        }
+
+        // Convert the sorted array back to a string using "]"
+        //Set sortedItems = $LISTTOSTRING(fruitsArray, "]")
+
+        Write "sorted"
+        //Write sortedItems
+        Write "sorted"
+
+
+        // Convert the comma-separated list to a Cache list
+        //Set itemList = $ListBuild(items)
+
+        // Sort the list
+       // Sort the list using the default collation order
+        //set fruits = split(items, ",")
+        //Set fruits = $LISTFROMSTRING(items, ",")
+        //Write fruits
+        //set a = Sort(fruits)
+
+        // Convert the sorted list back to a comma-separated list
+        //Set sortedItems = $ListBuild(itemList, ",")
+
+        //Write sortedItems
+
+        //write items
+
+        //return items
+        */
+    </script>
+    <!-- ------------------------------------------------------------ -->
+    
+    <h>MySelectOptions</th>
+    <select name=Name cspbind=Name>#(..ColumnSelect2("Email"))#</select>
+    
+    <script language="javascript">
+        // JavaScript implementation
+        // Driver code
+        let arr = ["GeeksforGeeks", "Quiz", "Practice", "Gblogs", "Coding"];
+        let arr = ["Banana", "Juice", "Apple", "Maheu", "Sadza","Drink", "Pap"];
+        let arr = ",Banana,Juice,Apple, Maheu, Sadza, Drink, Pap"
+        function sortStrings(arr) {
+            let temp;
+
+            // Sorting strings using bubble sort
+            for (let j = 0; j < arr.length - 1; j++) {
+                for (let i = j + 1; i < arr.length; i++) {
+                    if (arr[j].localeCompare(arr[i]) > 0) {
+                        temp = arr[j];
+                        arr[j] = arr[i];
+                        arr[i] = temp;
+                    }
+                }
+            }
+        }
+
+        sortStrings(arr);
+        console.log("Strings in sorted order are : ");
+        for (let i = 0; i < arr.length; i++) {
+            console.log(`String ${i + 1} is ${arr[i]}`);
+        }
+
+        // Function to be called on page load
+        function onPageLoad() {
+            sortStrings(arr);
+            console.log("Strings in sorted order are : ");
+            for (let i = 0; i < arr.length; i++) {
+                console.log(`String ${i + 1} is ${arr[i]}`);
+            }
+        }
+
+        // Call onPageLoad when the window has finished loading
+        window.onload = onPageLoad;
+    </script>
+
+    <script language=cache method=ColumnSelect2 arguments="Name:%String" returntype="%String" procedureblock>
+        Set Result = "<option value="""">&nbsp;</option>" _ $$$EOL
+        //Set ClassName = "Mentor.Author"
+        //Set PropertyName = Name
+        //Set pd = ##class(%Dictionary.PropertyDefinition).%OpenId(ClassName_"||"_PropertyName)
+        //If pd = "" Quit Result
+        //Set ValueList = pd.Parameters.GetAt("VALUELIST")
+        //Set ValueList = ,Opengesteld,Geblokkeerd,Afgesloten
+
+        Set ValueList = $ListBuild("Orange", "Apple", "Juice")
+
+        Set DisplayList = $ListBuild("Orange", "Apple", "Juice")
+        write DisplayList
+
+        write "test"
+        Set DisplayList = ["Orange", "Apple", "Juice"]
+        write "test"
+        write DisplayList
+
+
+
+        //If ValueList = "" Quit
+        //Set DisplayList = pd.Parameters.GetAt("DISPLAYLIST")
+        //If DisplayList = "" Set DisplayList = ValueList
+        //If pd.Required Set Result = ""
+        Set ValueSep = $Extract(ValueList), DisplaySep = $Extract(DisplayList)
+
+
+
+
+        Set CurrentValue = ""
+        For i=2:1:$Length(ValueList,ValueSep) {
+            Set Value = $Piece(ValueList, ValueSep, i)
+            Set Display = $Piece(DisplayList, DisplaySep, i)
+            ;CSPBind does a display-to-logical conversion on save, so we need the display value here.
+            Set Result = Result_"<option value=""" _ ..EscapeHTML(Display)_""""
+            If Value = CurrentValue Set Result = Result_" selected"
+            Set Result = Result _ ">" _ ..EscapeHTML(Display) _ "</option>" _ $$$EOL
+        }
+        write Result
+
+        //return Result
+        return 1
+    
+    </script>
+    <script language=cache method=doubleTest arguments="Name:%String" returntype=%Status procedureblock>
+        Set Result = "<select name=" _ Name _ ">"
+
+        ;Values are the actual column names, displays what to display in the column header (initially equal)
+        Set Values=$ListBuild(
+            $ListBuild("1st", "first"),
+            $ListBuild("3rd", "third"),
+            $ListBuild("2nd", "second"),
+            $ListBuild("4th", "forth"),
+            $ListBuild("8th", "eigth"),
+            $ListBuild("9th", "nineth"),
+            $ListBuild("11th", "eleventh"),
+        )
+        
+        Set Result=Result_"<option value="""">&nbsp;</option>"
+
+        For i = 1 : 1 : $ListLength(Values) {
+            Set Data = $ListGet(Values,i), Value = $ListGet(Data,1), Display = $ListGet(Data,2)
+            Set Result = Result _ "<option value=""" _ $ZConvert(Value,"O","HTML") _ """"
+            If %request.Get(Name) = Value Set Result = Result _ " selected"
+            Set Result = Result _ ">" _ $ZConvert(Display,"O","HTML") _ "</option>"
+        }
+
+        Set Result = Result _ "</select>"
+        
+
+        Quit Result
+    </script>
+    <!-- ------------------------------------------------------------ -->
+    <!-- ------------------------------------------------------------ -->
+    Sorteren op
+    #(..ColumnSelect("Sort"))# 
+    #(..doubleTest("Sort"))#
+
+    <script language=cache method=ColumnSelect arguments="Name:%String" returntype="%String" procedureblock>
+	Set Result = "<select name=" _ Name _ ">"
+
+	;Values are the actual column names, displays what to display in the column header (initially equal)
+	Set Values=$ListBuild(
+		$ListBuild("Act_Id", "Act_Id"),
+		$ListBuild("ApplicationId", "ApplicatieId"),
+		$ListBuild("PatientId", "BSN"),
+		$ListBuild("Custodian_URA", "URA"),
+		$ListBuild("Custodian_UZI", "UZI beheersverantwoordelijke"),
+		$ListBuild("Owner_UZI", "UZI inhoudsverantwoordelijke")
+	)
+
+    
+	Set Result=Result_"<option value="""">&nbsp;</option>"
+
+	For i = 1 : 1 : $ListLength(Values) {
+		Set Data = $ListGet(Values,i), Value = $ListGet(Data,1), Display = $ListGet(Data,2)
+		Set Result = Result _ "<option value=""" _ $ZConvert(Value,"O","HTML") _ """"
+		If %request.Get(Name) = Value Set Result = Result _ " selected"
+		Set Result = Result _ ">" _ $ZConvert(Display,"O","HTML") _ "</option>"
+	}
+
+	Set Result = Result _ "</select>"
+	
+	Quit Result
+</script>
+    <!-- ------------------------------------------------------------ -->
+    <fieldset class="Round">
+        <legend class="Legend">Test</legend>
+        <div>
+            <select id="myselectd" multiple size="8" onchange="myselectf();">
+
+                <script language="cache" runat="server">
+                    &SQL(DECLARE dcCur CURSOR FOR
+                        SELECT Name, Email INTO :Name, :Email
+                        FROM Mentor.Author
+                        ORDER BY Name
+                        )
+                    &SQL(OPEN dcCur)
+                    For  {
+                        &SQL(FETCH dcCur)
+                        If SQLCODE Quit
+                        Write "<option value="""_Name_""""
+                        //If Config.myselect[Name Write " selected "
+                        Write ">"_Name_"&nbsp;"_Email_"</option>",!
+                    }
+                    &SQL(CLOSE dcCur)
+                </script>
+            </select>
+            <input type="hidden" name="myselect" id="myselect" cspbind="myselect">
+        </div>
+    </fieldset>
+    <!-- ------------------------------------------------------------ -->
+
+    <csp:object name=Obj classname="Mentor.Author" objid="#(%request.Get("OBJID"))#" cspjs=All>
+
+    <h>MySelectOptions</th>
+    <select name=Name cspbind=Name>#(..meth(Obj.Name))#</select>
+    <!-- ------------------------------------------------------------ -->
+
+    <!-- Modal -->
+    <div class="modal" id="modal" tabindex="-1">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addBookHeader">Add Author</h5>
+              <h5 class="modal-title" id="editBookHeader">Edit Author</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                  <div class="form-group">
+                    <label for="id" class="col-form-label" hidden></label>
+                    <input type="text" id="id" hidden>
+                    <label for="name" class="col-form-label">Name:</label>
+                    <input type="text" class="form-control" id="name" placeholder="">
+                    <label for="email" class="col-form-label">Email:</label>
+                    <input type="text" class="form-control" id="email" placeholder="">
+                    <label for="gender" class="col-form-label">Gender:</label>
+                    <input type="text" class="form-control" id="gender" placeholder="">
+                    <br>
+
+                    <csp:query name="Books" classname="Mentor.Book" queryname="GetAllBooks"></csp:query>
+                    
+                    Select Books
+                    <div class="form-check">
+                        <label class="form-check-label" for="flexCheckChecked">
+                            #(..GetAllBooks())#
+                        </label>
+                    </div>
+                  </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button id="newBtn" type="button" class="btn btn-primary" onclick="saveNewAuthorJs()">Save Author</button>
+              <button id="editBtn" type="button" class="btn btn-primary" onclick="updateAuthorJs()">Save Changes</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+
+    <h1 class="header">List of Authors</h1>
+    <button class="btn btn-primary cst-btn" onclick="addAuthorJs()">Add Author</button>
+    <a href="/mentor/books.csp" class="cst-btn">Books Link</a>
+    <csp:include page="spinner.csp"/>
+    <div id="cst-tab">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Gender</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+            <csp:query name="Authors" classname="Mentor.Author" queryname="GetAllAuthors">
+                <csp:while condition="Authors.Next()">
+                    <tr>
+                    <td>#(Authors.ID)#</td>
+                    <td>#(Authors.Name)#</td>
+                    <td>#(Authors.Email)#</td>
+                    <td>#(Authors.Gender)#</td>
+                    <td>
+                        <button class="btn btn-primary cst-btn" onclick="editAuthorJs(#(Authors.ID)#)">Edit</button>
+                        <button class="btn btn-primary cst-btn" onclick="deleteAuthorJs(#(Authors.ID)#)">Delete</button>
+                    </td>
+                </tr>
+                </csp:while>
+            </csp:query>
+        </tbody>
+    </table>
+
+    </div> 
+
+    <script language=cache method=meth arguments="CurrentValue:%String" returntype="%String" procedureblock>
+        /// Creates options for a GebruikersInteractie dropdown;
+        
+        Set Result="<option>&nbsp;</option>"_$$$EOL
+        ;Set Result=Result_"<option value='*'>*</option>"_$$$EOL
+        Set rs=##class(%ResultSet).%New()
+        Set sc = rs.Prepare("SELECT distinct %EXACT(Name) as gi FROM Mentor.Author ORDER BY Name")
+        Set sc=rs.Execute()
+        While rs.Next() {
+            Set Name=..EscapeHTML(rs.Get("gi"))
+            Set Result=Result_"<option value="""_Name_""""
+            If Name=CurrentValue Set Result=Result_" selected"
+            Set Result=Result_">"_Name_"</option>"_$$$EOL
+        }
+        Quit Result
+    </script>
+
+    <!-- Scripts -->
+	<script language="javascript">
+        function idCheck() {
+            if (document.getElementById('id').value) {
+                document.getElementById('addBookHeader').style.display = 'none'
+                document.getElementById('editBookHeader').style.display = 'block'
+                document.getElementById('newBtn').style.display = 'none'
+                document.getElementById('editBtn').style.display = 'block'
+            } else {
+                document.getElementById('addBookHeader').style.display = 'block'
+                document.getElementById('editBookHeader').style.display = 'none'
+                document.getElementById('newBtn').style.display = 'block'
+                document.getElementById('editBtn').style.display = 'none'
+            }
+        }
+
+        function addAuthorJs() {
+            document.getElementById('id').value = ""
+            document.getElementById('name').value = ""
+            document.getElementById('email').value = ""
+            document.getElementById('gender').value = ""
+            
+            InitializeCheckboxes();
+            idCheck();
+            $('#modal').modal('show');
+        }
+
+        function saveNewAuthorJs() {
+            checkedValues = getCheckboxes();
+            let obj = {
+                Name: document.getElementById('name').value,
+                Email: document.getElementById('email').value,
+                Gender: document.getElementById('gender').value,
+                BooksValue: checkedValues
+            }
+
+            let jsonString = JSON.stringify(obj)
+            console.log('res: ', jsonString);
+            let res = #server(Mentor.Author.AddAuthor(jsonString))#
+            //console.log('res: ', res);
+            location.reload(); // Refresh the current page
+        }
+
+        function InitializeCheckboxes() {
+            const checkboxes = document.querySelectorAll('.checkbox-item');
+            checkboxes.forEach((checkbox) => {
+                checkbox.checked = false;
+            });
+        }
+
+        function editAuthorJs(authorID){
+            InitializeCheckboxes();
+            let resString = #server(Mentor.Author.GetAuthorDetails(authorID))# // Author details
+            let resObject = JSON.parse(resString)
+            let res = #server(..GetBooksForAuthor(authorID))# // books that belong to Author
+            let booksForAuthor = JSON.parse(res)
+            
+            document.getElementById('id').value = resObject.ID
+            document.getElementById('name').value = resObject.Name
+            document.getElementById('email').value = resObject.Email
+            document.getElementById('gender').value = resObject.Gender
+
+            for (let i=0; i<booksForAuthor.length; i++) {
+                let bookId = booksForAuthor[i].ID
+                const checkbox = document.getElementById(`checkbox_${bookId}`); // .value
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            }
+            idCheck();
+            $('#modal').modal('show')
+        }
+
+        function getCheckboxes() {
+            checkboxes = document.querySelectorAll('.checkbox-item');
+            const checkedValues = [];
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    let id = checkbox.id.split('_')[1]; 
+                    let value = checkbox.value;
+                    checkedValues.push({'ID':id, 'Name': value})
+                }
+            });
+            return checkedValues
+        }
+
+        function updateAuthorJs() {
+            checkedValues = getCheckboxes();
+
+            let obj = {
+                ID: document.getElementById('id').value,
+                Name: document.getElementById('name').value,
+                Email: document.getElementById('email').value,
+                Gender: document.getElementById('gender').value,
+                BooksValue: checkedValues
+            }
+
+            let jsonString = JSON.stringify(obj)
+            let res = #server(Mentor.Author.EditAuthor(jsonString))#
+            // console.log('updateAuthorJs res: ', res);
+            location.reload(); // Refresh the current page
+        }
+
+        function deleteAuthorJs(authorID) {
+            if (confirm("Are you sure you want to delete this book?")) {
+                #server(Mentor.Author.DeleteAuthor(authorID))#
+                location.reload(); // Refresh the current page
+            }
+        }
+
+		function openEditModal(author) {
+            console.log('author: ', author)
+            // Show the edit modal
+            $('#modal').modal('show');
+		}
+	</script>
+
+    <!-- Task -->
+
+    <!-- TODO: Help Isaac and myself learn this shit -->
+    <!-- FIXME: Isaac try solve this -->
+    <!-- <csp:query name="Author" classname="Mentor.Author" queryname="GetAuthorByName">
+        <csp:parameter name="Name" value='{%request.Get("User")}' />
+    </csp:query>
+
+    <csp:while condition="Author.Next()">
+    <p>AUT #(Author.Name)#</p>
+    </csp:while> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <script src="assets/js/main.js"></script>
+    </body>
+
+</HTML>
+
+<script language="cache" method="GetBooksForAuthor" arguments="ID:%String" returntype="%Status">
+    Set author = ##class(Mentor.Author).%OpenId(ID)
+    Set authorBookList = author.Bridge
+    Set books = []
+    Set checkboxSize = authorBookList.Count()
+    For i=1:1:authorBookList.Count() {
+        Set bookAuthor = authorBookList.GetAt(i)
+        Set obj = {}
+        Set obj.ID = bookAuthor.Book.%Id()
+        Set obj.Name = bookAuthor.Book.Name
+        Do books.%Push(obj)
+    }
+
+    return books.%ToJSON()
+</script>
+
+<script language="cache" method="GetAllBooks" returntype="%String">
+    while (Books.Next()) {
+        Write "<input id='checkbox_"_Books.ID_"' type='checkbox' class='checkbox-item' name='selectedBooks' value='"_Books.Name_"'>"_Books.Name_"<br>"
+    }
+    Return ""
+</script>
+
+

@@ -1,0 +1,8 @@
+{
+    "objectscript.conn": {
+        "server": "iris-local",
+        "ns": "MENTOR",
+        "active": true
+    },
+    "workbench.colorTheme": "InterSystems Default Dark"
+}

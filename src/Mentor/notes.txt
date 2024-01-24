@@ -1,0 +1,685 @@
+// Add Author Start 
+// Processing for AddAuthor Process saving a new author
+
+// enter author details
+// assign books an author wrote: all scenarios create a new author
+//      assign existing books to new author being created -> (references old book)
+//      create a new book the author wrote -> (creates a new book)
+//      an author without a book published/stored yet -> (no book ref or creation)
+// Save changes
+
+// NB: A new book should only be created if it doesnt exist else ref an existing book
+
+// Add a feature where on the modal a person can add a new book and enter title same
+// way they enter the author in the same modal
+//     - use 2 components as in vue for 'choose author header' or 'new author header'
+// Add $ZTrap
+#; If $$$ISOK(bookAuthorStatus) {
+#;     Write "Author, Book, and relationship associated successfully.", !
+#; } else {
+#;     Write "Not all we saved"
+#; }
+// Add Author End
+
+// constraints
+
+// change booksValue to booksContents
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// temp Codes
+------------------------ Author ------------------------------
+Write ".....new phase..........", "</br>"
+Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT * FROM Mentor.BookAuthor WHERE Author =:ID")
+While rs.%Next() {
+Write "obj ID: ", obj.ID, "</br>"
+Write "book: ", rs.Book, "</br>"
+/* Set bookAuthor = ##class(Mentor.BookAuthor).%OpenId(obj.ID)
+If bookAuthor.%Exists() {
+// Author exists, you can access its properties and perform actions
+Write "Author with ID ", obj.ID, " exists. Name: ", author.Name, !
+} else {
+// Author does not exist
+Write "Author with ID ", obj.ID, " does not exist.", !
+}
+Set book = ##class(Mentor.Book).%OpenId("1")
+
+// link the book and the author using bookAuthor
+Set bookAuthor.Author = author
+Set bookAuthor.Book = book
+// Saving
+// Set bookAuthorStatus = bookAuthor.%Save()
+
+write "book with ID: ", obj.ID, "Exists"
+write "</br>"
+write "book Name: ", obj.Name, ". "
+write "</br></br>"
+//write "book Name from OpenID: ", bookAuthor.Author.Name
+//write "</br></br>"
+
+Write !, "Books Menu:", "</br>"
+
+// Set author = ##class(Mentor.Author).%OpenId(rs.Author)
+Set book = ##class(Mentor.Book).%OpenId(rs.Book)
+Set authorId = 1  // Replace with the ID you want to check
+
+
+Write !, "received books ref: ", rs.Book, "</br>",!
+Write !, "received books Name: ", book.Name, "</br>",!
+Write "</br>"
+*/
+}
+
+// To Learn
+For i = 1:1:$ListLength(bookNames) {
+    Set bookTitle = $ListGet(bookNames, i)
+    Set existingBookTitles(bookTitle) = 1
+}
+------------------------ Author End------------------------------
+
+
+
+
+
+
+
+
+// Editing Code
+<script language="cache" runat="Server">
+    // new structure for BookValues will require having an ID for the book
+    // Also linked it to the updateAuthorJS when receiving ids and data for selected books
+    // we should have the below structure
+    // {"ID":"1","Name":"Isaac N","Email":"isaac@gmail.com","Gender":"Male","BooksValue":[{"ID":"1","Name":"How to be one with oneself"}, {"ID":"2","Name":"How to make money"}]}
+
+    // change booksValue to booksContents
+    
+    // save Author
+
+    write "</br></br>"
+
+    Set result = {"ID":"1","Name":"Isaac Nangara","Email":"itnangara@gmail.com","Gender":"male","BooksValue":[{"ID":"24","Name":"How to be one with oneself"}, {"ID":"6","Name":"How to make money"},{"ID":"4","Name":"Peace be Peace"},{"ID":"1","Name":"How to be a kickass mentor"}]}
+    Set temp = result.ID
+    Set author = ##class(Mentor.Author).%OpenId(temp)
+    Set author.Name = result.Name
+    Set author.Email = result.Email
+    Set author.Gender = result.Gender
+
+    if author '= "" {
+        Set bookAuthorList = author.Bridge // list of Books array/list reference
+        // write "Book Count: ", bookAuthorList.Count(), "</br>","</br>"
+
+        Set existingBookTitles = [] // tracking existing books from DB, assigned books values from book relationship
+        
+        // Loop through the DB Table books
+        For i = 1:1:bookAuthorList.Count() {
+            Set bookAuthor = bookAuthorList.GetAt(i)
+            Set book = bookAuthor.Book
+
+            Set existingBookTitles(book.Name) = 1 // Add existing book titles to the list (dictionary)
+
+            write "Book: ", bookAuthor.Book.Name, "</br>"
+        }
+
+        // Loop through the new book titles from the UI
+        Set booksArray = result.BooksValue
+        Set iterator = booksArray.%GetIterator()
+        
+        Write "</br>"
+        Write "</br>", "..... UI Books .....", "</br>"
+        Set tempForDisplay = booksArray.%GetIterator()
+        While tempForDisplay.%GetNext(.key, .obj){
+            Write "The book from UI: ", obj.Name, "</br>"
+        }
+        Write "</br>", "</br>"
+
+        // Following line iterates through ** UI Data ** -> first book, second book, third book....
+        Set dbBooksRemover = []
+        While iterator.%GetNext(.key, .obj){
+            Set dbBooksRemover(obj.Name) = obj.ID
+
+            Set bookName = obj.Name
+            If $Data(existingBookTitles(bookName)) {
+                Write "</br>"
+                Write "Congrats: The book title: ", bookName, " -> exists in existing in BookTitles.", !
+                // Do Nothing
+            } else {
+                // The book is not referenced to the current author, so create a new reference
+                Set book = ##class(Mentor.Book).%OpenId(obj.ID)
+                If book '= "" {
+                    Set authorBook = ##class(Mentor.BookAuthor).%New()
+                    Set authorBook.Author = author
+                    Set authorBook.Book = book
+                    Write "</br>", "The book title: ", authorBook.Book.Name, " -> does not exist in existing in BookTitles.", "</br>", !
+                    // Set sc = authorBook.%Save()
+                    /*If ($$$ISOK(sc)) {
+                        Write "New reference created for book: ", bookName, !
+                    } else {
+                        Write "Error creating reference for book: " //sc.$$$ERRORCODE, " - ", sc.$$$ERRORTEXT, !
+                    }*/
+                }
+            }
+        }
+
+        Write "</br>","</br>"
+        // Remove books that are no longer associated with the author
+        Set bookAuthorList = author.Bridge
+        For i = 1:1:bookAuthorList.Count() {
+            Set bookAuthor = bookAuthorList.GetAt(i)
+            Set book = bookAuthor.Book
+            Set bookName = book.Name
+
+            // Check if the book is in the list of new book titles
+            If $Data(dbBooksRemover(bookName)) {
+                Write "Old DB Books + added: ", bookName, !
+            } else {
+                // This book is no longer associated with the author, so remove the reference
+                Write "</br>", "Delete ref NAME: ", book.Name, "</br>", !
+                // Set tSC = bookAuthor.%Delete()
+                /*
+                    Set tSC = bookAuthor.%Delete()
+                    If $$$ISOK(tSC) {
+                        Write "Removed reference for book: ", book.Title, !
+                    } Else {
+                        Write "Error removing reference for book: ", tSC.$$$ERRORCODE, " - ", tSC.$$$ERRORTEXT, !
+                    }
+                */
+            }
+            Write "</br>"
+        }
+    
+    
+        // 1 -Recieve Data
+        Set result = {"ID":"46","Name":"Isaac N","Email":"isaac@gmail.com","Gender":"Male","BooksValue":[{"ID":"1","Name":"How to be one with oneself"}, {"ID":"2","Name":"How to make money"}]}
+
+        // 2 - Opening an Author
+        Set ID = result.ID
+        Set author = ##Class(Mentor.Author).%OpenId(result.ID)
+        Set author.Name = result.Name
+        Set author.Email = result.Email
+        Set author.Gender = result.Gender
+        // write "author Name test: ", author.Name, " ....author Email test: ", author.Email, " ....author Gender test: ", author.Gender,"</br>"
+
+        // 3 - Accessing all books that belong to the Author
+        Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT * FROM Mentor.BookAuthor WHERE Author =:ID")
+
+        // 4 - Accessing the books received from UI
+        //      -> check every book against books in DB (stored in rs)
+        If (author '= "") {
+            Set booksArray = result.BooksValue
+            Set iterator = booksArray.%GetIterator()
+
+            // Following line iterates through first book, second book, third book....
+            While iterator.%GetNext(.key, .obj){ // ** obj.ID = book ID from UI used for comparison **
+                if (obj.ID) {
+                    Set bk = ##class(%SQL.Statement).%ExecDirect(,"SELECT * FROM Mentor.BookAuthor WHERE Author =:ID")
+                    if rs.%Next(){
+                        // following line iterates all books in the Book Author table until loops stop
+                        While rs.%Next() {
+                            // Write "exists authors: ", rs.Author, "</br>"
+                            // Write "exists books: ", rs.Book, "</br>"
+                            // if (rs.Book = obj.ID) {
+                            //    Write "book: ", obj.ID, " from UI Exist", "</br>"
+                            //} else {
+                            //    Write "book: ", obj.ID, " from UI does not Exist", "</br>"
+                            //}
+                        }
+                    } else {
+                        Write "Does not exist"
+                        // Add an existing book but which does not belong to the Author yet
+                        set book = ##class(Mentor.Book).%OpenId(obj.ID)
+
+                        // Create a new bookAuthor with Author and Book ref
+                        Set bookAuthor = ##class(Mentor.BookAuthor).%New()
+                        Set bookAuthor.Author = author
+                        Set bookAuthor.Book = book
+                        // Saving
+                        // Set bookAuthorStatus = bookAuthor.%Save()
+                    }
+
+                    // For all books in Author but not passed from UI, We need to remove references
+
+                    write "another book ......................","</br>"
+                } else {
+                    write "book with ID: ", obj.ID, "does not exist"
+                }
+            }
+            set author.Name = result.Name
+            set author.Email = result.Email
+            set author.Gender = result.Gender
+        }
+    }
+</script>
+
+
+Class Mentor.Author Extends %Persistent
+{
+
+Property Name As %String;
+
+Property Email As %String;
+
+Property Gender As %String;
+
+// Property Authors As list of Mentor.Author;
+
+// Index AuthorName On Name [ Unique ];
+
+// BookAuthor
+
+Relationship Bridge As Mentor.BookAuthor [ Cardinality = many, Inverse = Author ];
+
+Query GetAllAuthors() As %SQLQuery [ SqlProc ]
+{
+    SELECT *
+    FROM Mentor.Author
+}
+
+ClassMethod AddAuthor(objString) As %Status
+{
+    set ID = ""
+    set result = {}
+    set result = result.%FromJSON(objString)
+    Try {
+        if (result '= "") {            
+            // create a new Author
+            Set author = ##class(Mentor.Author).%New()
+            Set author.Name = result.Name
+            Set author.Email = result.Email
+            Set author.Gender = result.Gender
+
+            if (result.BooksValue = "") {
+                Set status = author.%Save()
+            } else {
+                &SQL(
+                    Declare SC Cursor 
+                    For SELECT ID INTO :ID
+                    FROM Mentor.Book
+                    WHERE Name = :result.BooksValue
+                )
+                &SQL(Open SC)
+
+                Quit:(SQLCODE'=0)
+                IF SQLCODE<0 { WRITE "SQLCODE error ",SQLCODE," ",%msg  QUIT }
+                ELSEIF SQLCODE=100 {WRITE "Author not found"  QUIT}
+                
+                &SQL(Fetch SC)
+
+                Set bookAuthor = ##class(Mentor.BookAuthor).%New()
+                if (ID '= "") {
+                    // if ID exists, make a reference to the existing book
+                    set book = ##class(Mentor.Book).%OpenId(ID)
+                } else {
+                    // create a new book
+                    Set book = ##class(Mentor.Book).%New()
+                    Set book.Name = result.BooksValue
+                }
+                // link the book and the author using bookAuthor
+                Set bookAuthor.Author = author
+                Set bookAuthor.Book = book
+                Set bookAuthorStatus = bookAuthor.%Save()
+            }
+        }
+    }
+    Catch (err) {
+        Set %response.Status = 500
+        return {"errormessage":"Server Error"}
+    }
+    return $$$OK
+}
+
+ClassMethod EditAuthor(objString) As %Status
+{
+    set result = {}
+    set result = result.%FromJSON(objString)
+    set authorId = result.ID
+   
+    Set author = ##class(Mentor.Author).%OpenId(authorId)
+    Set author.Name = result.Name
+    Set author.Email = result.Email
+    Set author.Gender = result.Gender
+
+    if author '= "" {
+        Set existingBookTitles = [] // tracking existing books from DB, assigned books values from book relationship
+        Set bookAuthorList = author.Bridge // list of Books array/list reference
+        For i = 1:1:bookAuthorList.Count() {
+            Set bookAuthor = bookAuthorList.GetAt(i)
+            Set book = bookAuthor.Book
+            Set existingBookTitles(book.Name) = 1 // Add existing book titles to the list (dictionary)
+            // write "DB Book: ", bookAuthor.Book.Name, "</br>"
+        }
+
+        Set booksArray = result.BooksValue
+        Set iterator = booksArray.%GetIterator()
+        Set dbBooksRemover = []
+
+        // Iterate through ** UI Books **
+        While iterator.%GetNext(.key, .obj){
+            Set dbBooksRemover(obj.Name) = obj.ID
+
+            Set bookName = obj.Name
+            If $Data(existingBookTitles(bookName)) {
+                // Do Nothing
+            } else {
+                // The book is not referenced to the current author, create a new reference
+                Set book = ##class(Mentor.Book).%OpenId(obj.ID)
+                If book '= "" {
+                    Set authorBook = ##class(Mentor.BookAuthor).%New()
+                    Set authorBook.Author = author
+                    Set authorBook.Book = book
+                    Set sc = authorBook.%Save()
+                }
+            }
+        }
+
+        // Remove books that are no longer associated with the author
+        Set bookAuthorList = author.Bridge
+        For i = 1:1:bookAuthorList.Count() {
+            Set bookAuthor = bookAuthorList.GetAt(i)
+            Set book = bookAuthor.Book
+            Set bookName = book.Name
+
+            If $Data(dbBooksRemover(bookName)) {
+            } else {
+                // This book is no longer associated with the author, so remove the reference
+                //Write "</br>", "Delete ref NAME: ", book.Name, "</br>", !
+                set tSC = ##class(Mentor.BookAuthor).%DeleteId(bookAuthor.%Id())
+            }
+        }
+    } /* */
+}
+
+ClassMethod tempEditAuthor(objString) As %Status
+{
+
+    // recieve ID for Author and Details for Author
+    // Edit Author Process (if ID exists, though it should)
+    //      -> get the actual author (use openID)
+    //      -> get the actual book
+    //      -> check if there is an existing record in BookAuthor table with author & book above
+    //      ->      // if not then proceed to save
+    // save Author
+
+    Set result = {}
+    Set result = result.%FromJSON(objString)
+
+    Write result.%ToJSON()
+
+
+    #; set result = {}
+    #; set result = result.%FromJSON(objString)
+
+    #; if (result.ID) {
+    #;     Try {
+    #;         Set author = ##class(Mentor.Author).%OpenId(result.ID)
+    #;         Set author.Name = result.Name
+    #;         Set author.Email = result.Email
+    #;         Set author.Gender = result.Gender
+    #;         #; set status = author.%Save()
+    #;     }
+    #;     Catch err {
+    #;         set %response.Status = 500
+    #;         return {"Error Message":"Server Error"}
+    #;     }
+    #; }
+
+    return $$$OK
+}
+
+Query GetAuthorByName(Name As %String) As %SQLQuery [ SqlProc ]
+{
+    SELECT *
+    FROM Mentor.Author
+    WHERE Name = :Name
+}
+
+Query GetAuthor(ID As %String) As %SQLQuery [ SqlProc ]
+{
+    SELECT *
+    FROM Mentor.Author
+    WHERE ID = :ID
+}
+
+ClassMethod AuthReturn() As %Status
+{
+    Set authors = ##class(%SQL.Statement).%ExecDirect("SELECT * FROM Mentor.Author") 
+
+    Return authors
+}
+
+ClassMethod bookAuthorReturn() As %Status
+{
+    Set bookAuthor = ##class(%SQL.Statement).%ExecDirect("SELECT * FROM Mentor.BookAuthor") 
+
+    Return bookAuthor
+}
+
+ClassMethod BookReturn() As %Status
+{
+    Set author = ##class(Mentor.Author).%OpenId("1")
+
+    Return author
+}
+
+ClassMethod RelTest() As %Status
+{
+    Set authors = ##class(%SQL.Statement).%ExecDirect("SELECT * FROM Mentor.Author") 
+    Set bookAuthor = ##class(%SQL.Statement).%ExecDirect("SELECT * FROM Mentor.BookAuthor") 
+    
+    #; Set author = ##class(Mentor.Author).%OpenId("2")
+
+    #; write "author: ", author
+    #; write "bookAuthor: ", bookAuthor
+
+    #; Set ab1 = author.Bridge // 2
+    #; Set ab2 = author.Bridge
+
+    // retrieve all authors
+    // for an author, retrieve the books related
+    // BA:1, B:24, A:45
+
+    Set author = ##class(Mentor.Author).%OpenId("2")
+    set i = 0
+    while i<author.Bridge.Count() {
+        write author.Bridge.GetAt(i) 
+        set i = i + 1
+    }
+
+    Return $$$OK
+}
+
+Query GetAuthorsWithBooks() As %SQLQuery [ SqlName = AuthorList, SqlProc ]
+{
+    SELECT
+        a.Id AS AuthorId,
+        a.Name AS AuthorName,
+        b.Name AS BookTitle
+    FROM
+        Mentor.Author a
+    LEFT JOIN
+        Mentor.BookAuthor ba ON a.ID = ba.ID
+    LEFT JOIN
+        Mentor.Book b ON ba.ID = b.ID
+}
+
+ClassMethod GetAuthorDetails(ID As %String) As %Status
+{
+    Set author = ##Class(Mentor.Author).%OpenId(ID)
+    
+    If (author '= "") {
+        Set result = {}
+        set result.ID = ID // do not do author.ID because ID is not a class property of Author
+        set result.Name = author.Name
+        set result.Email = author.Email
+        set result.Gender = author.Gender
+
+        Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT * FROM Mentor.BookAuthor WHERE Author = :ID")
+        While rs.%Next() {
+            Write rs.Name, !
+        }
+
+        //Set result.BooksValue = 
+
+
+        #; Set s = {}
+        #; Set bookAuthors = author.Bridge.Book
+        #; For i = 1:1:2 {
+        #;     Set bookAuthor = bookAuthors.GetAt(i)  // Get the individual BookAuthor relationship object
+            
+        #;     #; // Access the associated author and book objects directly
+        #;     #; Set authorId = bookAuthor.Author.Id  // Access the ID of the associated author
+        #;     #; Set bookId = bookAuthor.Book.Id      // Access the ID of the associated book
+
+        #;     #; Write "Author ID: ", authorId, !
+        #;     #; Write "Book ID: ", bookId, !
+        #; }
+        #; write getAt(1)
+
+        #; Write "Book test: ", book.%ToJSON()
+
+        #; Set bridge = author.Bridge // Access the bridging table
+    }
+    return result.%ToJSON()
+}
+
+/// Method to delete an Author
+ClassMethod DeleteAuthor(ID As %String) As %Status
+{
+    Try {
+        if (ID '= "") {
+            set status = ##class(Mentor.Author).%DeleteId(ID)
+        }
+    }
+    Catch err {
+        set %response.Status = 500
+        return {"error message":"Server Error"}
+    }
+    return $$$OK
+}
+
+Storage Default
+{
+<Data name="AuthorDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Name</Value>
+</Value>
+<Value name="3">
+<Value>Email</Value>
+</Value>
+<Value name="4">
+<Value>Gender</Value>
+</Value>
+</Data>
+<DataLocation>^Mentor.AuthorD</DataLocation>
+<DefaultData>AuthorDefaultData</DefaultData>
+<IdLocation>^Mentor.AuthorD</IdLocation>
+<IndexLocation>^Mentor.AuthorI</IndexLocation>
+<StreamLocation>^Mentor.AuthorS</StreamLocation>
+<Type>%Storage.Persistent</Type>
+}
+
+}
+
+
+
+    <script language="cache" arguments="objString" method="testAdd" returntype="%Status">
+        set ID = ""
+        set result = {}
+        set result = result.%FromJSON(objString)
+
+        Set booksArray = result.BooksValue
+        Set iterator = booksArray.%GetIterator()
+        
+        Try {
+            if (result '= "") {            
+                // create a new Author
+                Set author = ##class(Mentor.Author).%New()
+                Set author.Name = result.Name
+                Set author.Email = result.Email
+                Set author.Gender = result.Gender
+                if (result.BooksValue.%Size()<=0) {
+                    Set status = author.%Save()
+                } else {
+                    // Iterate through ** UI Books **
+                    While iterator.%GetNext(.key, .obj){
+                        Set book = ##class(Mentor.Book).%OpenId(obj.ID)
+                        If book '= "" {
+                            Set authorBook = ##class(Mentor.BookAuthor).%New()
+                            Set authorBook.Author = author
+                            Set authorBook.Book = book
+                            Set status = authorBook.%Save()
+                        }
+                    }
+                }
+
+
+            }
+        }
+
+        Catch (err) {
+            Set %response.Status = 500
+            return {"errormessage":"Server Error"}
+        }
+
+
+        /*Try {
+            if (result '= "") {            
+                // create a new Author
+                Set author = ##class(Mentor.Author).%New()
+                Set author.Name = result.Name
+                Set author.Email = result.Email
+                Set author.Gender = result.Gender
+                Set status = author.%Save()
+
+                if (result.BooksValue = "") {
+                    Set status = author.%Save()
+                } else {
+                    &SQL(
+                        Declare SC Cursor 
+                        For SELECT ID INTO :ID
+                        FROM Mentor.Book
+                        WHERE Name = :result.BooksValue
+                    )
+                    &SQL(Open SC)
+
+                    Quit:(SQLCODE'=0)
+                    IF SQLCODE<0 { WRITE "SQLCODE error ",SQLCODE," ",%msg  QUIT }
+                    ELSEIF SQLCODE=100 {WRITE "Author not found"  QUIT}
+                    
+                    &SQL(Fetch SC)
+
+                    Set bookAuthor = ##class(Mentor.BookAuthor).%New()
+                    if (ID '= "") {
+                        // if ID exists, make a reference to the existing book
+                        set book = ##class(Mentor.Book).%OpenId(ID)
+                    } else {
+                        // create a new book
+                        Set book = ##class(Mentor.Book).%New()
+                        Set book.Name = result.BooksValue
+                    }
+                    // link the book and the author using bookAuthor
+                    Set bookAuthor.Author = author
+                    Set bookAuthor.Book = book
+                    Set bookAuthorStatus = bookAuthor.%Save()
+                }
+            }
+        }
+        Catch (err) {
+            Set %response.Status = 500
+            return {"errormessage":"Server Error"}
+        }*/
+        return $$$OK
+    </script>

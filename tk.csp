@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<HTML>
+    <head>
+        <title>TK Test</title>
+    </head>
+
+    <body>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    </body>
+
+</HTML>
+
+<script language="cache" method="Temp Fixer" arguments="ID:%String" returntype="%Status">
+    // from LSP.ApplicationRegister.Data.Application
+    obj.ApplicationId
+    obj.GBX.GBXId
+    obj.GBX.Organization.OrganizationId.Extension						
+    obj.ApplicationName
+    obj.ActionMode
+    obj.Comment
+    obj.HostName
+    obj.Protocol
+    obj.XDSAddress
+
+
+    SELECT * FROM 
+	( 
+	SELECT %NOLOCK Distinct AuthorId AuthorId, STARTDATE STARTDATE
+	FROM Mentor.Author 
+	LEFT JOIN Mentor.AllCombinations 
+    ON Author.Aid = AllCombinations.Author 
+	LEFT JOIN Mentor.Book 
+    ON Book.Aid = AllCombinations.Book 
+	) 
+    WHERE LOWER(AuthorId) = '1'
+
+    // join the first to the second then the second to the third, what ever is before the other is the on that comes first in the ON
+
+    // Author.Aid:              Author = 1st table (Mentor.Author) and Aid = field in that table
+    // AllCombinations.Author:  AllCombinations = 2nd table which is first in the LEFT JOIN Mentor.AllCombinations and Author = field in that table
+    // Author.Aid:              Author = 1st table (Mentor.Author) and Aid = field in that table
+    // Book.Aid:                Book = 3rd table which is 2nd in the LEFT JOIN Mentor.Book and Author = field in that table
+
+
+    select * FROM Mentor.Author 
+    LEFT JOIN Mentor.BookAuthor 
+    ON Author.Guid = BookAuthor.Author
+    
+    return 1
+</script>
+
+<script language="cache" method="GetAuthorsForBook" arguments="ID:%String" returntype="%Status">
+    // adding a tk change for NL... to HistoryAppReg
+    //  -> reference to tkd inside HistoryAppReg
+
+    return 1
+</script>
+
+
+

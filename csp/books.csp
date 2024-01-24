@@ -1,0 +1,236 @@
+<!DOCTYPE HTML>
+<HTML>
+    <head>
+        <title>Book List</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    </head>
+
+    <body>
+    <!-- Modal -->
+	<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addBookHeader">Add Book</h5>
+              <h5 class="modal-title" id="editBookHeader">Edit Book</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                  <div class="form-group">
+                    <label for="id" class="col-form-label" hidden></label>
+                    <input type="text" id="id" hidden>
+                    <label for="name" class="col-form-label">Name:</label>
+                    <input type="text" class="form-control" id="name">
+
+                    <br>
+                    <csp:query name="Authors" classname="Mentor.Author" queryname="GetAllAuthors"></csp:query>
+                    Select Author:
+                    <div class="form-check">
+                        <label class="form-check-label" for="flexCheckChecked">
+                            #(..GetAllAuthors())#
+                        </label>
+                    </div>
+                    <input type="checkbox" name="status" value="#(..EscapeHTML(%request.Get("incomplete")))#">
+  Incomplete
+                    Set complete = ##class(%Boolean).Logical(..EscapeHTML(%request.Get("complete")))
+
+                  </div>
+                </form>
+            </div>
+            <div class="modal-footer">                
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="newBtn" type="button" class="btn btn-primary" onclick="saveNewBookJs()">Save Book</button>
+                <button id="editBtn" type="button" class="btn btn-primary" onclick="updateBookJs()">Save changes</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <!-- Books Section -->
+    <h1 class="header">List of Books</h1>
+    <button class="btn btn-primary cst-btn" onclick="addBookJs()">Add Book</button>
+    <a href="/mentor/index.csp" class="cst-btn">Authors Link</a>
+    <csp:include page="spinner.csp"/>
+    <div id="cst-tab">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+        </tr>
+        </thead>
+        <tbody>
+            <csp:query name="Books" classname="Mentor.Book" queryname="GetAllBooks">
+                <csp:while condition="Books.Next()">
+                    <tr>
+                    <td>#(Books.Get("ID"))#</td>
+                    <td>#(Books.Get("Name"))#</td>
+                    <td>
+                        <button class="btn btn-primary cst-btn" onclick="editBookJs(#(Books.ID)#)">Edit</button>
+                        <button class="btn btn-primary cst-btn" onclick="deleteModalJs(#(Books.ID)#)">Delete</button>
+                    </td>
+                </tr>
+                </csp:while>
+            </csp:query>
+        </tbody>
+    </table>
+    </div>
+
+    <script language="javascript">
+        function idCheck() {
+            var addBookHeader = document.getElementById('addBookHeader')
+            var editBookHeader = document.getElementById('editBookHeader')
+            var newBtn = document.getElementById('newBtn')
+            var editBtn = document.getElementById('editBtn')
+            if (document.getElementById('id').value) {
+                // Headers
+                addBookHeader.style.display = 'none'
+                editBookHeader.style.display = 'block'
+                // Saving Buttons
+                newBtn.style.display = 'none'
+                editBtn.style.display = 'block'
+            } else {
+                // Headers
+                addBookHeader.style.display = 'block'
+                editBookHeader.style.display = 'none'
+                // Saving Buttons
+                newBtn.style.display = 'block'
+                editBtn.style.display = 'none'
+            }
+        }
+
+        function InitializeCheckboxes() {
+            const checkboxes = document.querySelectorAll('.checkbox-item');
+            checkboxes.forEach((checkbox) => {
+                checkbox.checked = false;
+            });
+        }
+
+        function getCheckboxes() {
+            checkboxes = document.querySelectorAll('.checkbox-item');
+            const checkedValues = [];
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    let id = checkbox.id.split('_')[1]; 
+                    let value = checkbox.value;
+                    checkedValues.push({'ID':id, 'Name': value})
+                }
+            });
+            return checkedValues
+        }
+
+        function addBookJs() {
+            document.getElementById('id').value = ""
+            document.getElementById('name').value = ""
+
+            InitializeCheckboxes();
+            idCheck();
+            $('#modal').modal('show');         
+        }
+
+        function saveNewBookJs() {
+            checkedValues = getCheckboxes();
+
+            let obj = {
+                Name: document.getElementById('name').value,
+                AuthorsValue: checkedValues
+            }
+            let jsonString = JSON.stringify(obj)
+
+            let res = #server(Mentor.Book.AddBook(jsonString))#
+            //console.log('saveNewBookJs res ', res);
+            location.reload();
+        }
+
+        function editBookJs(bookId) {
+            InitializeCheckboxes();          
+            let resString = #server(Mentor.Book.GetBookDetails(bookId))#
+            let obj = JSON.parse(resString)
+            console.log('res: ', obj)
+            let res = #server(..GetAuthorsForBook(bookId))# // Authors that belong to Book
+            let booksForAuthor = JSON.parse(res)
+
+            document.getElementById('id').value = obj.ID
+            document.getElementById('name').value = obj.Name
+
+            for (let i=0; i<booksForAuthor.length; i++) {
+                let bookId = booksForAuthor[i].ID
+                const checkbox = document.getElementById(`checkbox_${bookId}`); // .value
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            }
+
+            idCheck();
+            $('#modal').modal('show')
+        }
+
+        function updateBookJs() {
+            checkedValues = getCheckboxes();
+
+            let obj = {
+                ID: document.getElementById('id').value,
+                Name: document.getElementById('name').value,
+                AuthorsValue: checkedValues
+            }
+
+            let jsonString = JSON.stringify(obj)
+            let res = #server(Mentor.Book.EditBook(jsonString))#
+            //console.log('updateBookJs res: ', res);
+            location.reload();
+        }
+
+        function deleteModalJs(bookId) {
+            if (confirm("Are you sure you want to delete this book?")) {
+                #server(Mentor.Book.DeleteBook(bookId))#
+                location.reload();
+            }
+        }
+    </script>
+
+    <!-- Task -->
+
+    <!-- TODO: Help Isaac and myself learn this shit -->
+    <!-- FIXME: Isaac try solve this -->
+    <!-- <csp:query name="Book" classname="Mentor.Book" queryname="GetBookByName">
+        <csp:parameter name="Name" value='{%request.Get("User")}' />
+    </csp:query>
+
+    <csp:while condition="Book.Next()">
+    <p>AUT #(Book.Name)#</p>
+    </csp:while> -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <script src="assets/js/main.js"></script>
+    </body>
+
+</HTML>
+
+<script language="cache" method="GetAuthorsForBook" arguments="ID:%String" returntype="%Status">
+    Set book = ##class(Mentor.Book).%OpenId(ID)
+    Set authorBookList = book.Bridge
+    Set authors = []
+    Set checkboxSize = authorBookList.Count()
+    
+    For i=1:1:authorBookList.Count() {
+        Set bookAuthor = authorBookList.GetAt(i)
+        Set obj = {}
+        Set obj.ID = bookAuthor.Author.%Id()
+        Set obj.Name = bookAuthor.Author.Name
+        Do authors.%Push(obj)
+    }
+
+    return authors.%ToJSON()
+</script>
+
+<script language="cache" method="GetAllAuthors" returntype="%String">
+    while (Authors.Next()) {
+        Write "<input id='checkbox_"_Authors.ID_"' type='checkbox' class='checkbox-item' name='selectedBooks' value='"_Authors.Name_"'>"_Authors.Name_"<br>"
+    }
+    Return ""
+</script>
+
+
